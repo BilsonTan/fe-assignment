@@ -341,4 +341,89 @@ describe('Meridian Banking Application', () => {
     await user.click(premiumRadio)
     expect(document.documentElement.getAttribute('data-segment')).toBe('premium')
   })
+
+  it('supports hiding and revealing balances across the dashboard', async () => {
+    const user = userEvent.setup()
+    renderApp()
+
+    await waitFor(() => {
+      expect(screen.getByText('Total available')).toBeInTheDocument()
+    })
+
+    // Initially balances are visible
+    expect(screen.getByText(/17,120\.55/)).toBeInTheDocument()
+    expect(screen.getByText(/4,280\.55/)).toBeInTheDocument()
+
+    // Click balance toggle button
+    const hideBtn = screen.getByRole('button', { name: 'Hide balances' })
+    await user.click(hideBtn)
+
+    // Balances are masked
+    expect(screen.queryByText(/17,120\.55/)).not.toBeInTheDocument()
+    const maskedElements = screen.getAllByText('SGD ****')
+    expect(maskedElements.length).toBeGreaterThanOrEqual(2)
+
+    // Click again to reveal
+    const showBtn = screen.getByRole('button', { name: 'Show balances' })
+    await user.click(showBtn)
+
+    expect(screen.getByText(/17,120\.55/)).toBeInTheDocument()
+  })
+
+  it('prompts confirmation when attempting to discard a half-filled transfer', async () => {
+    const user = userEvent.setup()
+    renderApp()
+
+    await waitFor(() => {
+      expect(screen.getByRole('heading', { name: 'Good evening, Ava' })).toBeInTheDocument()
+    })
+
+    const openTransferBtns = screen.getAllByRole('button', { name: /new transfer/i })
+    await user.click(openTransferBtns[0])
+
+    // Pick Jamie Tan and advance to amount step so form is half-filled
+    const payeeRadio = await screen.findByRole('radio', { name: /Jamie Tan/i })
+    await user.click(payeeRadio)
+    await user.click(screen.getByRole('button', { name: 'Continue' }))
+
+    await waitFor(() => {
+      expect(screen.getByRole('heading', { name: 'How much?' })).toBeInTheDocument()
+    })
+
+    // Try closing dialog via close button
+    const closeBtn = screen.getByRole('button', { name: 'Close transfer dialog' })
+    await user.click(closeBtn)
+
+    // Discard confirmation dialog appears
+    expect(screen.getByRole('heading', { name: 'Discard this transfer?' })).toBeInTheDocument()
+
+    // Click "Keep editing"
+    const keepEditingBtn = screen.getByRole('button', { name: 'Keep editing' })
+    await user.click(keepEditingBtn)
+
+    expect(screen.queryByRole('heading', { name: 'Discard this transfer?' })).not.toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'How much?' })).toBeInTheDocument()
+
+    // Try closing again and choose "Discard"
+    await user.click(closeBtn)
+    const discardBtn = screen.getByRole('button', { name: 'Discard' })
+    await user.click(discardBtn)
+
+    // Dialog is now closed
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog', { name: 'New transfer' })).not.toBeInTheDocument()
+    })
+  })
+
+  it('supports opening transfer dialog via #transfer hash link', async () => {
+    window.location.hash = '#transfer'
+    renderApp()
+
+    await waitFor(() => {
+      expect(screen.getByRole('heading', { name: 'Who are you sending to?' })).toBeInTheDocument()
+    })
+
+    // Clean up hash
+    window.location.hash = ''
+  })
 })

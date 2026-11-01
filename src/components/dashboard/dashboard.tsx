@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useAccounts, useCustomer, useTransactions } from '../../api'
 import { Button } from '../../common'
 import { SegmentSwitch } from '../header'
@@ -15,6 +15,7 @@ interface DashboardProps {
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({ onOpenTransfer }) => {
+  const [isBalanceHidden, setIsBalanceHidden] = useState(false)
   const customerQuery = useCustomer()
   const accountsQuery = useAccounts()
   const transactionsQuery = useTransactions(8)
@@ -69,9 +70,17 @@ export const Dashboard: React.FC<DashboardProps> = ({ onOpenTransfer }) => {
             </div>
           </div>
 
-          <BalanceHero accounts={accounts} onOpenTransfer={onOpenTransfer} />
+          <BalanceHero
+            accounts={accounts}
+            onOpenTransfer={onOpenTransfer}
+            isBalanceHidden={isBalanceHidden}
+            onToggleBalance={() => setIsBalanceHidden((prev) => !prev)}
+          />
 
-          <AccountsList accounts={accounts} />
+          <AccountsList
+            accounts={accounts}
+            isBalanceHidden={isBalanceHidden}
+          />
 
           <TransactionList transactions={transactions} />
         </main>

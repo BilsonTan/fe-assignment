@@ -20,13 +20,44 @@
   gap: var(--space-4);
 }
 
+.hero-label-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
 .hero-label {
   font-size: var(--text-xs);
   font-weight: var(--weight-semibold);
   letter-spacing: 0.05em;
   text-transform: uppercase;
   opacity: 0.9;
-  margin-bottom: var(--space-2);
+}
+
+.balance-toggle-btn {
+  background: transparent;
+  border: none;
+  padding: 4px;
+  margin: -4px;
+  border-radius: var(--radius-sm);
+  color: var(--on-hero);
+  opacity: 0.8;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity var(--duration-fast) var(--ease-out);
+}
+
+.balance-toggle-btn:hover {
+  opacity: 1;
+}
+
+.balance-toggle-btn:focus-visible {
+  outline: 2px solid var(--on-hero);
+  outline-offset: 2px;
+  opacity: 1;
 }
 
 .hero-balance {

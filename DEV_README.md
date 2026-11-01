@@ -82,6 +82,23 @@ src/
 
 ---
 
+## Stretch goals & optional enhancements implemented
+
+1. **Daily-limit Progress Bar:**
+   - Visual progress indicator in the right rail showing real-time utilization of the customer's daily SGD 5,000 transfer limit.
+2. **Balance-hide Toggle:**
+   - Eye icon button on the `BalanceHero` card allowing users to mask their total available balance and all individual account balances with `SGD ****` for privacy in public spaces.
+3. **`Discard this transfer?` Confirmation Modal:**
+   - If the user has made partial inputs (selected a payee, typed amount, or note) and attempts to close the transfer wizard, a confirmation modal prompts them with `Keep editing` and `Discard` buttons, preventing accidental data loss.
+4. **`#transfer` Deep Link:**
+   - URL hash synchronization allowing direct navigation to the transfer dialog via `#transfer` on load or link share, with automatic cleanup upon closing.
+5. **Evaluator Debug Menu:**
+   - Collapsible debug toolbar in the bottom-right corner enabling instant switching between mock API scenarios (`?scenario=error`, `?scenario=empty`, and `?delay=2000`) without manually editing code or query strings.
+6. **Automated CI Workflow:**
+   - GitHub Actions workflow (`.github/workflows/ci.yml`) enforcing `npm run check` (ESLint + TypeScript + Vitest) and `npm run build` on every push and pull request.
+
+---
+
 ## Loading, empty and error states
 
 1. **Dashboard Loading:**

@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useCreateTransfer, type TransferResponse } from '../../api'
+import { Button } from '../../common'
 import type { TransferFormData, TransferStep } from '../../types'
 import { Stepper } from './stepper'
 import { StepRecipient } from './step-recipient'
@@ -28,6 +29,7 @@ export const TransferDialog: React.FC<TransferDialogProps> = ({
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [transferResponse, setTransferResponse] =
     useState<TransferResponse | null>(null)
+  const [showDiscardConfirm, setShowDiscardConfirm] = useState(false)
 
   const dialogRef = useRef<HTMLDivElement>(null)
   const triggerRef = useRef<HTMLElement | null>(null)
@@ -39,8 +41,27 @@ export const TransferDialog: React.FC<TransferDialogProps> = ({
     setFormData(INITIAL_FORM_DATA)
     setSubmitError(null)
     setTransferResponse(null)
+    setShowDiscardConfirm(false)
     onClose()
   }, [onClose])
+
+  const isFormHalfFilled = useCallback(() => {
+    if (step === 'success') return false
+    if (step !== 'recipient') return true
+    if (formData.payeeId || formData.recipient) return true
+    if (formData.amount.trim() || formData.note.trim()) return true
+    return false
+  }, [step, formData])
+
+  const requestClose = useCallback(() => {
+    if (createTransferMutation.isPending) return
+
+    if (isFormHalfFilled()) {
+      setShowDiscardConfirm(true)
+    } else {
+      handleClose()
+    }
+  }, [createTransferMutation.isPending, isFormHalfFilled, handleClose])
 
   // Track the element that triggered the dialog so we can return focus on close
   useEffect(() => {
@@ -58,13 +79,17 @@ export const TransferDialog: React.FC<TransferDialogProps> = ({
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         e.preventDefault()
-        handleClose()
+        if (showDiscardConfirm) {
+          setShowDiscardConfirm(false)
+        } else {
+          requestClose()
+        }
       }
     }
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [isOpen, handleClose])
+  }, [isOpen, showDiscardConfirm, requestClose])
 
   if (!isOpen) return null
 
@@ -112,74 +137,106 @@ export const TransferDialog: React.FC<TransferDialogProps> = ({
 
   const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget && !createTransferMutation.isPending) {
-      handleClose()
+      requestClose()
     }
   }
 
   return (
-    <div
-      className="dialog-overlay"
-      onClick={handleOverlayClick}
-      data-testid="transfer-dialog-overlay"
-    >
+    <>
       <div
-        ref={dialogRef}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="transfer-dialog-title"
-        className="transfer-dialog"
+        className="dialog-overlay"
+        onClick={handleOverlayClick}
+        data-testid="transfer-dialog-overlay"
       >
-        <div className="dialog-header">
-          <h1 id="transfer-dialog-title" className="dialog-title">
-            New transfer
-          </h1>
-          <button
-            type="button"
-            className="dialog-close-btn"
-            onClick={handleClose}
-            aria-label="Close transfer dialog"
-            title="Close"
-            disabled={createTransferMutation.isPending}
-          >
-            ✕
-          </button>
+        <div
+          ref={dialogRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="transfer-dialog-title"
+          className="transfer-dialog"
+        >
+          <div className="dialog-header">
+            <h1 id="transfer-dialog-title" className="dialog-title">
+              New transfer
+            </h1>
+            <button
+              type="button"
+              className="dialog-close-btn"
+              onClick={requestClose}
+              aria-label="Close transfer dialog"
+              title="Close"
+              disabled={createTransferMutation.isPending}
+            >
+              ✕
+            </button>
+          </div>
+
+          <Stepper currentStep={step} />
+
+          {step === 'recipient' && (
+            <StepRecipient
+              formData={formData}
+              onNext={handleNextFromRecipient}
+              onCancel={requestClose}
+            />
+          )}
+
+          {step === 'amount' && (
+            <StepAmount
+              formData={formData}
+              onNext={handleNextFromAmount}
+              onBack={handleBackToRecipient}
+            />
+          )}
+
+          {step === 'review' && (
+            <StepReview
+              formData={formData}
+              isSubmitting={createTransferMutation.isPending}
+              submitError={submitError}
+              onBack={handleBackToAmount}
+              onConfirm={handleConfirmTransfer}
+            />
+          )}
+
+          {step === 'success' && transferResponse && (
+            <SuccessPanel
+              transferResponse={transferResponse}
+              onClose={handleClose}
+            />
+          )}
         </div>
-
-        <Stepper currentStep={step} />
-
-        {step === 'recipient' && (
-          <StepRecipient
-            formData={formData}
-            onNext={handleNextFromRecipient}
-            onCancel={handleClose}
-          />
-        )}
-
-        {step === 'amount' && (
-          <StepAmount
-            formData={formData}
-            onNext={handleNextFromAmount}
-            onBack={handleBackToRecipient}
-          />
-        )}
-
-        {step === 'review' && (
-          <StepReview
-            formData={formData}
-            isSubmitting={createTransferMutation.isPending}
-            submitError={submitError}
-            onBack={handleBackToAmount}
-            onConfirm={handleConfirmTransfer}
-          />
-        )}
-
-        {step === 'success' && transferResponse && (
-          <SuccessPanel
-            transferResponse={transferResponse}
-            onClose={handleClose}
-          />
-        )}
       </div>
-    </div>
+
+      {/* Discard Transfer Confirmation Dialog */}
+      {showDiscardConfirm && (
+        <div
+          className="discard-dialog-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="discard-dialog-title"
+        >
+          <div className="discard-dialog">
+            <h2 id="discard-dialog-title" className="discard-title">
+              Discard this transfer?
+            </h2>
+            <p className="discard-desc">
+              You have unsaved transfer details. Any information you entered will be lost.
+            </p>
+            <div className="discard-actions">
+              <Button
+                variant="secondary"
+                onClick={() => setShowDiscardConfirm(false)}
+              >
+                Keep editing
+              </Button>
+              <Button variant="primary" onClick={handleClose}>
+                Discard
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   )
 }

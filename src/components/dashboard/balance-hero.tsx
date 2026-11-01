@@ -1,4 +1,5 @@
 import React from 'react'
+import { Eye, EyeOff } from 'lucide-react'
 import type { Account } from '../../api'
 import { Button } from '../../common'
 import { formatMoney } from '../../lib/format'
@@ -7,11 +8,15 @@ import './balance-hero.css'
 interface BalanceHeroProps {
   accounts: Account[]
   onOpenTransfer: () => void
+  isBalanceHidden?: boolean
+  onToggleBalance?: () => void
 }
 
 export const BalanceHero: React.FC<BalanceHeroProps> = ({
   accounts,
   onOpenTransfer,
+  isBalanceHidden = false,
+  onToggleBalance,
 }) => {
   const depositAccounts = accounts.filter((acc) => acc.type !== 'credit')
   const totalAvailable = depositAccounts.reduce((sum, acc) => sum + acc.balance, 0)
@@ -21,11 +26,29 @@ export const BalanceHero: React.FC<BalanceHeroProps> = ({
     <section className="balance-hero" aria-labelledby="total-available-label">
       <div className="hero-top">
         <div>
-          <div id="total-available-label" className="hero-label">
-            Total available
+          <div className="hero-label-group">
+            <div id="total-available-label" className="hero-label">
+              Total available
+            </div>
+            {onToggleBalance && (
+              <button
+                type="button"
+                className="balance-toggle-btn"
+                onClick={onToggleBalance}
+                aria-label={isBalanceHidden ? 'Show balances' : 'Hide balances'}
+                aria-pressed={isBalanceHidden}
+                title={isBalanceHidden ? 'Show balances' : 'Hide balances'}
+              >
+                {isBalanceHidden ? (
+                  <EyeOff size={16} aria-hidden="true" />
+                ) : (
+                  <Eye size={16} aria-hidden="true" />
+                )}
+              </button>
+            )}
           </div>
           <div className="hero-balance amount">
-            {formatMoney(totalAvailable)}
+            {isBalanceHidden ? 'SGD ****' : formatMoney(totalAvailable)}
           </div>
           <div className="hero-caption">
             Across {depositCount} deposit accounts
