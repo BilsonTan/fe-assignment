@@ -1,5 +1,7 @@
 # Meridian Banking — Frontend Take-Home
 
+> 💡 **Candidate Submission Readme:** Please see [DEV_README.md](./DEV_README.md) for Bilson Sim's project documentation, architectural decisions, testing rationale, and trade-offs.
+
 Build a small banking app for one customer: a **dashboard** that shows her
 accounts and recent transactions, and a **three-step transfer** that sends money
 to a payee.
@@ -102,7 +104,7 @@ explain.
 1. **Deploy** to Netlify, Vercel or Cloudflare Pages (settings in
    [`DEPLOYMENT.md`](DEPLOYMENT.md)). The deployed site must work with no local
    server.
-2. **Replace this README** with your own, using the outline below.
+2. **Replace this README** with your own, using the outline below (or reference [DEV_README.md](./DEV_README.md)).
 3. **Reply to the invitation email** with your repo URL and your deployed URL.
 
 ### Your README

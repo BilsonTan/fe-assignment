@@ -1,39 +1,30 @@
-import { useQuery } from '@tanstack/react-query'
-import { apiFetch } from './api/client'
-import type { Health } from './api/types'
+import React, { useState } from 'react'
+import { ThemeProvider } from './context'
+import { Header } from './components/header'
+import { Dashboard } from './components/dashboard'
+import { TransferDialog } from './components/transfer'
 
-export default function App() {
-  const health = useQuery({
-    queryKey: ['health'],
-    queryFn: () => apiFetch<Health>('/api/health'),
-    retry: false,
-  })
+export default function App(): React.JSX.Element {
+  const [isTransferOpen, setIsTransferOpen] = useState(false)
 
-  const status = health.isPending
-    ? 'checking…'
-    : health.isError
-      ? 'not connected'
-      : 'connected'
+  const handleOpenTransfer = () => {
+    setIsTransferOpen(true)
+  }
+
+  const handleCloseTransfer = () => {
+    setIsTransferOpen(false)
+  }
 
   return (
-    <div className="starter">
-      <header className="starter-header">
-        <strong>Meridian</strong>
-        <span>Take-home starter</span>
-      </header>
-
-      <main className="starter-main">
-        <h1>Build the dashboard and transfer flow</h1>
-        <p>
-          Start with <code>README.md</code>, then read{' '}
-          <code>brief/candidate-brief.md</code>. Replace this screen with your
-          app.
-        </p>
-
-        <p className="status" role="status">
-          Mock API: {status}
-        </p>
-      </main>
-    </div>
+    <ThemeProvider>
+      <div className="app-shell">
+        <Header />
+        <Dashboard onOpenTransfer={handleOpenTransfer} />
+        <TransferDialog
+          isOpen={isTransferOpen}
+          onClose={handleCloseTransfer}
+        />
+      </div>
+    </ThemeProvider>
   )
 }
