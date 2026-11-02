@@ -159,6 +159,6 @@ The test suite in `src/App.test.tsx` and `src/schemas/transfer-schema.test.ts` c
 ## Not done / known issues
 
 - **Multiple currency accounts:** The mock API and brief specify single-currency SGD accounts; multi-currency conversions or cross-border remittance were deliberately left out of scope per §2.
-- **Deep link `#transfer`:** Can be added via URL hash listener (`window.location.hash === '#transfer'`) to directly open the modal on load.
-- **Persistent segment on API:** The segment switch currently operates locally in `localStorage` per §3.4 without mutating customer profile on the backend.
+- **Persistent segment on API:** The segment switch currently operates locally in `localStorage` per §3.4 without mutating the customer profile on the backend API.
+- **Biometric authentication:** In a production mobile banking app, confirmation would ideally integrate WebAuthn/Passkeys before dispatching high-value transfers.
 
