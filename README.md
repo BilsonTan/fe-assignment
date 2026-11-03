@@ -3,9 +3,6 @@
 - Deployed: [URL](https://fe-assignment-omega.vercel.app)
 - Run locally: `npm install && npm run dev`
 
-> Deeper dive (architecture walkthrough, MSW/TanStack Query/Zod explainers,
-> accessibility notes, and interview-prep drills): [`docs/CODEBASE_GUIDE.md`](./docs/CODEBASE_GUIDE.md).
-
 ---
 
 ## Project structure
@@ -181,7 +178,7 @@ The test suite in `src/App.test.tsx` and `src/schemas/transfer-schema.test.ts` c
 - **Persistent segment on API:** The segment switch currently operates locally in `localStorage` per §3.4 without mutating the customer profile on the backend API.
 - **Transfers/payees reset on refresh (by design):** The mock API is in-memory and re-seeds on reload, which the brief states is expected ("a page refresh resets it"). I deliberately did **not** add `localStorage` persistence for transfers or new recipients: it would require editing the handlers (discouraged by the brief) or mirroring server data into a client store, which drifts from the mock's own state. Theme/segment persist because they're pure client state the brief asks to remember. Within a session, transfers correctly update the balance, transaction list, and daily limit via TanStack Query invalidation.
 - **Automated a11y checks not wired in:** The app follows the brief's explicit a11y requirements and the standard ARIA patterns, but there's no automated accessibility assertion in the suite. Adding `axe-core` (via `jest-axe` for structural checks, or `@axe-core/playwright` for contrast in a real browser) is listed under future iterations.
-- **WCAG-AA contrast not formally audited:** Styling uses the provided design tokens and follows WCAG-AA patterns, but colour-contrast across all four theme × segment combinations has not been machine-verified with axe/DevTools. See `docs/CODEBASE_GUIDE.md` §10.
+- **WCAG-AA contrast not formally audited:** Styling uses the provided design tokens and follows WCAG-AA patterns, but colour-contrast across all four theme × segment combinations has not been machine-verified with axe/DevTools.
 - **Biometric authentication:** In a production mobile banking app, confirmation would ideally integrate WebAuthn/Passkeys before dispatching high-value transfers.
 
 ---
