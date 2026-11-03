@@ -115,8 +115,9 @@ export const DebugMenu: React.FC = () => {
           <div className="debug-tip-box">
             <span className="debug-tip-label">💡 Test Transfer Failure (T7):</span>
             <span className="debug-tip-text">
-              Enter <code>#fail</code> in the transfer note on Step 2 to simulate
-              an API rejection.
+              On the <strong>Amount</strong> step, type <code>#fail</code> in the{' '}
+              <strong>Note (optional)</strong> field, then continue to Review and
+              confirm — the transfer is rejected and your money stays put.
             </span>
           </div>
         </div>
