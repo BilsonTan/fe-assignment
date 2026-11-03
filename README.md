@@ -226,6 +226,11 @@ scenarios:
 
 ![Debug menu demo](docs/demo/demo-debug.gif)
 
+**Mobile (390px)** — single column, fixed bottom `New transfer` bar, responsive
+transfer sheet:
+
+<img src="docs/demo/demo-mobile.gif" alt="Mobile demo" width="320" />
+
 ---
 
 ## Commands

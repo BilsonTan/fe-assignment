@@ -9,3 +9,5 @@ Markdown viewers):
   search, theme/segment switching.
 - `demo-debug.gif` — the `?debug=1` menu flipping the mock API into error /
   empty / slow scenarios.
+- `demo-mobile.gif` — mobile (390px) layout: single column, fixed bottom
+  transfer bar, responsive transfer sheet.
