@@ -1,6 +1,12 @@
 import { z } from 'zod'
 import { formatMoney } from '../lib/format'
 
+/**
+ * The ONE definition of the "new recipient" rules (brief §3.3).
+ * Every place that validates a new recipient — the recipient step form and
+ * any future reuse — runs these exact rules and messages. They are never
+ * re-implemented by hand elsewhere.
+ */
 export const newRecipientSchema = z.object({
   name: z
     .string()
@@ -14,11 +20,20 @@ export const newRecipientSchema = z.object({
   bank: z.string().trim().min(1, 'Please select or enter a bank.'),
 })
 
+export type NewRecipient = z.infer<typeof newRecipientSchema>
+
+/**
+ * Recipient step: either a saved payee is chosen, or the "someone new" fields
+ * are filled. We keep a flat object (rather than a discriminated union) because
+ * it plays far more nicely with React Hook Form's `FieldErrors` typing, but we
+ * do NOT duplicate the recipient rules — we delegate to `newRecipientSchema`
+ * via `.safeParse` and forward its issues, so the rules stay single-sourced.
+ */
 export const recipientStepSchema = z
   .object({
     isNewRecipient: z.boolean(),
     payeeId: z.string().optional(),
-    recipient: newRecipientSchema.optional(),
+    recipient: newRecipientSchema.partial().optional(),
   })
   .superRefine((data, ctx) => {
     if (!data.isNewRecipient) {
@@ -29,37 +44,18 @@ export const recipientStepSchema = z
           message: 'Please choose a recipient.',
         })
       }
-    } else {
-      if (!data.recipient?.name || data.recipient.name.trim().length < 2) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ['recipient', 'name'],
-          message: 'Name must be at least 2 characters.',
-        })
-      } else if (data.recipient.name.trim().length > 50) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ['recipient', 'name'],
-          message: 'Name must be 50 characters or less.',
-        })
-      }
+      return
+    }
 
-      if (
-        !data.recipient?.accountNumber ||
-        !/^\d{8}$/.test(data.recipient.accountNumber.trim())
-      ) {
+    // Run the single source of truth and re-map any issue onto the
+    // `recipient.<field>` path so RHF can show it inline.
+    const result = newRecipientSchema.safeParse(data.recipient ?? {})
+    if (!result.success) {
+      for (const issue of result.error.issues) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          path: ['recipient', 'accountNumber'],
-          message: 'Enter a valid 8-digit account number.',
-        })
-      }
-
-      if (!data.recipient?.bank || data.recipient.bank.trim().length === 0) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ['recipient', 'bank'],
-          message: 'Please select or enter a bank.',
+          path: ['recipient', ...issue.path],
+          message: issue.message,
         })
       }
     }
@@ -85,10 +81,9 @@ export function createAmountStepSchema(limits: AmountValidationLimits) {
           },
           { message: 'Amount must be at least SGD 1.00.' },
         )
-        .refine(
-          (val) => /^\d+(\.\d{1,2})?$/.test(val),
-          { message: 'Amount can have at most 2 decimal places.' },
-        ),
+        .refine((val) => /^\d+(\.\d{1,2})?$/.test(val), {
+          message: 'Amount can have at most 2 decimal places.',
+        }),
       note: z
         .string()
         .max(50, 'Note cannot exceed 50 characters.')
