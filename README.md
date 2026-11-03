@@ -1,4 +1,4 @@
-# Meridian Banking — Bilson Sim
+# Meridian Banking — Bilson Tan
 
 - Deployed: [URL](https://fe-assignment-omega.vercel.app)
 - Run locally: `npm install && npm run dev`
