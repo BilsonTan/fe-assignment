@@ -1,9 +1,19 @@
 .debug-menu-container {
   position: fixed;
-  bottom: var(--space-4);
+  /* On mobile the fixed "New transfer" bar occupies the bottom edge, so the
+     debug button sits above it (and clear of the safe-area inset) instead of
+     overlapping the CTA. */
+  bottom: calc(80px + env(safe-area-inset-bottom));
   right: var(--space-4);
   z-index: var(--z-toast);
   font-family: var(--font-sans);
+}
+
+@media (min-width: 640px) {
+  .debug-menu-container {
+    /* No mobile transfer bar on larger screens — return to the corner. */
+    bottom: var(--space-4);
+  }
 }
 
 .debug-menu-toggle {

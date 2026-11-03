@@ -3,7 +3,8 @@ import { ThemeProvider } from './context'
 import { Header } from './components/header'
 import { Dashboard } from './components/dashboard'
 import { TransferDialog } from './components/transfer'
-import { DebugMenu } from './components/debug-menu'
+import { DebugMenu } from './dev/debug-menu'
+import { isDebugEnabled } from './mocks/scenario'
 
 export default function App(): React.JSX.Element {
   const [isTransferOpen, setIsTransferOpen] = useState(() => {
@@ -51,7 +52,7 @@ export default function App(): React.JSX.Element {
           isOpen={isTransferOpen}
           onClose={handleCloseTransfer}
         />
-        <DebugMenu />
+        {isDebugEnabled() && <DebugMenu />}
       </div>
     </ThemeProvider>
   )

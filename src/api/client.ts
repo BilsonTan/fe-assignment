@@ -1,4 +1,5 @@
 import type { ApiErrorBody } from './types'
+import { getScenarioState } from '../mocks/scenario'
 
 /**
  * Small typed fetch wrapper. Build your query functions on top of this.
@@ -35,18 +36,17 @@ export async function apiFetch<T>(
       : 'http://localhost:5173'
   const url = new URL(`${BASE_URL}${cleanPath}`, origin)
 
-  // Propagate demo hooks (?scenario and ?delay) from window.location if present
-  if (typeof window !== 'undefined' && window.location.search) {
-    const pageParams = new URLSearchParams(window.location.search)
-    const scenario = pageParams.get('scenario')
-    const delay = pageParams.get('delay')
-
-    if (scenario && !url.searchParams.has('scenario')) {
-      url.searchParams.set('scenario', scenario)
-    }
-    if (delay && !url.searchParams.has('delay')) {
-      url.searchParams.set('delay', delay)
-    }
+  // Propagate the active demo scenario (error/empty/delay) onto every request
+  // so the MSW handlers can honour it. The scenario is held in memory by the
+  // debug menu (see src/mocks/scenario.ts), which means switching scenarios
+  // never reloads the page or re-registers the service worker — the behaviour
+  // is identical in local dev and in the deployed static build.
+  const { scenario, delayMs } = getScenarioState()
+  if (scenario !== 'normal' && !url.searchParams.has('scenario')) {
+    url.searchParams.set('scenario', scenario)
+  }
+  if (delayMs != null && !url.searchParams.has('delay')) {
+    url.searchParams.set('delay', String(delayMs))
   }
 
   const response = await fetch(url.toString(), init)
