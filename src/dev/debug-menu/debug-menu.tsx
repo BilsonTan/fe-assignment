@@ -18,10 +18,12 @@ export const DebugMenu: React.FC = () => {
     getScenarioState,
   )
 
-  // Persist the choice, then reload so the whole app re-boots into the new
-  // scenario. The scenario is read back from localStorage on startup, so this
-  // is a normal page load (the MSW worker starts the same way it does for any
-  // visitor) — no service-worker race, works identically locally and deployed.
+  /**
+   * Persist the choice, then reload so the whole app re-boots into the new
+   * scenario. The scenario is read back from localStorage on startup, so this
+   * is a normal page load (the MSW worker starts the same way it does for any
+   * visitor) — no service-worker race, works identically locally and deployed.
+   */
   const applyAndReload = () => {
     window.location.reload()
   }

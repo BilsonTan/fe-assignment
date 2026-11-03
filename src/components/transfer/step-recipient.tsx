@@ -94,8 +94,10 @@ export const StepRecipient: React.FC<StepRecipientProps> = ({
     } else if (errors.recipient?.bank) {
       setFocus('recipient.bank')
     }
-    // Payee-selection error can't take focus (radiogroup); the inline error
-    // is announced via role="alert" instead.
+    /**
+     * Payee-selection error can't take focus (it's a radiogroup); the inline
+     * error is surfaced visually and linked via aria-describedby instead.
+     */
   }
 
   const handleSelectSavedPayee = (id: string) => {

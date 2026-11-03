@@ -38,8 +38,10 @@ function readInitialState(): ScenarioState {
     return { scenario: 'normal', delayMs: null }
   }
 
-  // Seed from the URL once (so a shared `?scenario=error` link still works),
-  // then from localStorage so a manual toggle survives a refresh.
+  /**
+   * Seed from the URL once (so a shared `?scenario=error` link still works),
+   * then from localStorage so a manual toggle survives a refresh.
+   */
   const params = new URLSearchParams(window.location.search)
   const urlScenario = params.get('scenario')
   const urlDelay = params.get('delay')
@@ -69,9 +71,11 @@ const listeners = new Set<() => void>()
 
 const DEBUG_FLAG_KEY = 'meridian_debug_enabled'
 
-// Resolved once at module load (and cached), since the ?debug flag and its
-// side effects only need to be processed on the initial page load. Every later
-// call — of which there are many, one per apiFetch — is a cheap boolean read.
+/**
+ * Resolved once at module load (and cached), since the ?debug flag and its
+ * side effects only need to be processed on the initial page load. Every later
+ * call — of which there are many, one per apiFetch — is a cheap boolean read.
+ */
 function resolveDebugEnabled(): boolean {
   if (typeof window === 'undefined') return false
 
@@ -83,8 +87,10 @@ function resolveDebugEnabled(): boolean {
       return true
     }
     if (flag === '0') {
-      // Turning debug off also clears any active scenario, so a non-debug
-      // session never stays stuck in a forced error/empty/slow state.
+      /**
+       * Turning debug off also clears any active scenario, so a non-debug
+       * session never stays stuck in a forced error/empty/slow state.
+       */
       localStorage.removeItem(DEBUG_FLAG_KEY)
       localStorage.removeItem(STORAGE_KEY)
       state = { scenario: 'normal', delayMs: null }

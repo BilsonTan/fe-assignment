@@ -47,8 +47,10 @@ export const recipientStepSchema = z
       return
     }
 
-    // Run the single source of truth and re-map any issue onto the
-    // `recipient.<field>` path so RHF can show it inline.
+    /**
+     * Run the single source of truth and re-map any issue onto the
+     * `recipient.<field>` path so RHF can show it inline.
+     */
     const result = newRecipientSchema.safeParse(data.recipient ?? {})
     if (!result.success) {
       for (const issue of result.error.issues) {

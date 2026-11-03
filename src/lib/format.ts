@@ -17,8 +17,10 @@ export function formatMoney(amount: number): string {
   return money.format(amount)
 }
 
-// Dates are shown in Singapore time so the output doesn't depend on where the
-// app (or the test runner) happens to be.
+/**
+ * Dates are shown in Singapore time so the output doesn't depend on where the
+ * app (or the test runner) happens to be.
+ */
 const shortDate = new Intl.DateTimeFormat('en-SG', {
   day: 'numeric',
   month: 'short',

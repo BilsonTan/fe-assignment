@@ -38,8 +38,10 @@ export const TransferDialog: React.FC<TransferDialogProps> = ({
 
   const createTransferMutation = useCreateTransfer()
 
-  // Trap focus inside whichever dialog is on top: the discard confirmation
-  // when it's open, otherwise the main transfer dialog (brief T1/T8).
+  /**
+   * Trap focus inside whichever dialog is on top: the discard confirmation
+   * when it's open, otherwise the main transfer dialog (brief T1/T8).
+   */
   useFocusTrap(dialogRef, isOpen && !showDiscardConfirm)
   useFocusTrap(discardRef, isOpen && showDiscardConfirm)
 
@@ -79,8 +81,10 @@ export const TransferDialog: React.FC<TransferDialogProps> = ({
     }
   }, [isOpen])
 
-  // When advancing between steps, pull focus back into the dialog so keyboard
-  // users land on the new step's content instead of a detached element.
+  /**
+   * When advancing between steps, pull focus back into the dialog so keyboard
+   * users land on the new step's content instead of a detached element.
+   */
   useEffect(() => {
     if (!isOpen || showDiscardConfirm) return
     const dialog = dialogRef.current

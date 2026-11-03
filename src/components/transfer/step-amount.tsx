@@ -43,10 +43,12 @@ export const StepAmount: React.FC<StepAmountProps> = ({
   }, [depositAccounts, formData.fromAccountId, defaultAccountId])
 
   const availableBalance = selectedAccount?.balance ?? 0
-  // Derive the remaining limit from the customer data — never a hardcoded
-  // figure. Until the customer loads, use Infinity (no artificial cap) so
-  // validation doesn't block against a fabricated limit; the balance check
-  // still applies, and the real limit takes over as soon as it arrives.
+  /**
+   * Derive the remaining limit from the customer data — never a hardcoded
+   * figure. Until the customer loads, use Infinity (no artificial cap) so
+   * validation doesn't block against a fabricated limit; the balance check
+   * still applies, and the real limit takes over as soon as it arrives.
+   */
   const remainingDailyLimit = customerData?.customer
     ? Math.max(
         0,
