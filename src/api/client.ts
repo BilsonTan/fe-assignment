@@ -37,10 +37,11 @@ export async function apiFetch<T>(
   const url = new URL(`${BASE_URL}${cleanPath}`, origin)
 
   // Propagate the active demo scenario (error/empty/delay) onto every request
-  // so the MSW handlers can honour it. The scenario is held in memory by the
-  // debug menu (see src/mocks/scenario.ts), which means switching scenarios
-  // never reloads the page or re-registers the service worker — the behaviour
-  // is identical in local dev and in the deployed static build.
+  // so the MSW handlers can honour it. The scenario is persisted to localStorage
+  // by the debug menu (see src/mocks/scenario.ts) and read back on a normal page
+  // reload, and getScenarioState() only reports a scenario while debug mode is
+  // on — so the behaviour is identical in local dev and the deployed build, and
+  // never leaks into a non-debug session.
   const { scenario, delayMs } = getScenarioState()
   if (scenario !== 'normal' && !url.searchParams.has('scenario')) {
     url.searchParams.set('scenario', scenario)
