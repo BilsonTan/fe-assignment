@@ -28,6 +28,13 @@
   border-color: var(--focus-ring);
 }
 
+/* Hide the browser's native clear button for type="search" — we render our own
+   accessible clear button (with an aria-label) to avoid a duplicate ✕. */
+.search-input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
 .search-clear-btn {
   position: absolute;
   right: var(--space-2);

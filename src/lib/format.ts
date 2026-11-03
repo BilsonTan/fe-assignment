@@ -29,3 +29,16 @@ const shortDate = new Intl.DateTimeFormat('en-SG', {
 export function formatShortDate(iso: string): string {
   return shortDate.format(new Date(iso))
 }
+
+// Weekday + day + month, in Singapore time, e.g. `Tuesday, 20 October`.
+const longDate = new Intl.DateTimeFormat('en-SG', {
+  weekday: 'long',
+  day: 'numeric',
+  month: 'long',
+  timeZone: 'Asia/Singapore',
+})
+
+/** A Date (defaults to now) → `Tuesday, 20 October`, always in Singapore time. */
+export function formatLongDate(date: Date = new Date()): string {
+  return longDate.format(date)
+}

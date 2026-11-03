@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { usePayees } from '../../api'
-import { Button, InlineError, Skeleton } from '../../common'
+import { Button, EmptyState, InlineError, Skeleton } from '../../common'
 import {
   recipientStepSchema,
   type RecipientStepFormData,
@@ -40,6 +40,7 @@ export const StepRecipient: React.FC<StepRecipientProps> = ({
     register,
     handleSubmit,
     setValue,
+    setFocus,
     control,
     formState: { errors },
   } = useForm<RecipientStepFormData>({
@@ -74,7 +75,7 @@ export const StepRecipient: React.FC<StepRecipientProps> = ({
     if (validData.isNewRecipient && validData.recipient) {
       onNext({
         payeeId: undefined,
-        recipient: validData.recipient,
+        recipient: validData.recipient as TransferFormData['recipient'],
       })
     } else {
       onNext({
@@ -82,6 +83,19 @@ export const StepRecipient: React.FC<StepRecipientProps> = ({
         recipient: undefined,
       })
     }
+  }
+
+  // Move focus to the first invalid field on Continue (brief §3.3).
+  const onError = () => {
+    if (errors.recipient?.name) {
+      setFocus('recipient.name')
+    } else if (errors.recipient?.accountNumber) {
+      setFocus('recipient.accountNumber')
+    } else if (errors.recipient?.bank) {
+      setFocus('recipient.bank')
+    }
+    // Payee-selection error can't take focus (radiogroup); the inline error
+    // is announced via role="alert" instead.
   }
 
   const handleSelectSavedPayee = (id: string) => {
@@ -98,7 +112,11 @@ export const StepRecipient: React.FC<StepRecipientProps> = ({
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="dialog-step-form" noValidate>
+    <form
+      onSubmit={handleSubmit(onSubmit, onError)}
+      className="dialog-step-form"
+      noValidate
+    >
       <div className="step-content">
         <h2 className="step-title">Who are you sending to?</h2>
 
@@ -129,6 +147,25 @@ export const StepRecipient: React.FC<StepRecipientProps> = ({
             <p className="step-error-banner" role="alert">
               Failed to load payees.
             </p>
+          ) : filteredPayees.length === 0 ? (
+            <EmptyState
+              message={
+                payeeFilter.trim()
+                  ? 'No payees match your search.'
+                  : 'No saved payees yet.'
+              }
+              action={
+                payeeFilter.trim() ? (
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => setPayeeFilter('')}
+                  >
+                    Clear search
+                  </Button>
+                ) : undefined
+              }
+            />
           ) : (
             <div className="payees-list" role="radiogroup" aria-label="Saved recipients">
               {filteredPayees.map((payee) => (

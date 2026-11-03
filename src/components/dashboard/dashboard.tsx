@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useAccounts, useCustomer, useTransactions } from '../../api'
 import { Button } from '../../common'
+import { formatLongDate } from '../../lib/format'
 import { SegmentSwitch } from '../header'
 import { BalanceHero } from './balance-hero'
 import { AccountsList } from './account-card'
@@ -58,18 +59,18 @@ export const Dashboard: React.FC<DashboardProps> = ({ onOpenTransfer }) => {
 
   return (
     <div className="dashboard-container">
+      <div className="dashboard-greeting-section">
+        <div>
+          <h1 className="dashboard-greeting">Good evening, Ava</h1>
+          <div className="dashboard-date">{formatLongDate()}</div>
+        </div>
+        <div className="mobile-segment-switch">
+          <SegmentSwitch />
+        </div>
+      </div>
+
       <div className="dashboard-content">
         <main className="dashboard-main">
-          <div className="dashboard-greeting-section">
-            <div>
-              <h1 className="dashboard-greeting">Good evening, Ava</h1>
-              <div className="dashboard-date">Tuesday, 20 October</div>
-            </div>
-            <div className="mobile-segment-switch">
-              <SegmentSwitch />
-            </div>
-          </div>
-
           <BalanceHero
             accounts={accounts}
             onOpenTransfer={onOpenTransfer}

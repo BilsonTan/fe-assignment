@@ -1,11 +1,15 @@
 .dashboard-container {
   max-width: var(--container);
   margin: 0 auto;
-  padding: var(--space-4) var(--gutter-mobile) var(--space-16);
+  /* Leave room at the bottom for the fixed mobile "New transfer" bar (~72px)
+     plus the device safe-area inset, so the Daily Limit card is never clipped. */
+  padding: var(--space-4) var(--gutter-mobile);
+  padding-bottom: calc(96px + env(safe-area-inset-bottom));
 }
 
 @media (min-width: 640px) {
   .dashboard-container {
+    /* No fixed bar on larger screens. */
     padding: var(--space-6) var(--gutter) var(--space-12);
   }
 }
@@ -36,6 +40,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
+  margin-bottom: var(--space-6);
 }
 
 @media (min-width: 640px) {
