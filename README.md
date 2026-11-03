@@ -2,6 +2,11 @@
 
 - Deployed: [URL](https://fe-assignment-omega.vercel.app)
 - Run locally: `npm install && npm run dev`
+- **Debug menu (evaluator tool):** append `?debug=1` to the URL —
+  [open deployed app with debug on](https://fe-assignment-omega.vercel.app/?debug=1).
+  A 🛠 Debug button appears (bottom-right) to switch the mock API into
+  error / empty / slow states. It's hidden by default; append `?debug=0` to turn
+  it off. More under [Stretch goals](#stretch-goals--optional-enhancements-implemented) §5.
 
 ---
 
@@ -164,11 +169,16 @@ The test suite in `src/App.test.tsx` and `src/schemas/transfer-schema.test.ts` c
 
 ## AI use
 
-- **Which tools & what for:** Used AI for initial project scaffolding, formulating a phased implementation plan, and generating initial component skeletons.
+- **Which tools & what for:** Used AI for initial project scaffolding, formulating a phased implementation plan, generating initial component skeletons, and as a reviewer/pair during a later hardening pass (spotting bugs, pressure-testing decisions). Every change was reviewed, and in several cases overridden, by hand.
 - **Where human decisions overrode/fixed AI suggestions:**
   1. *React Hook Form discriminated unions:* An initial AI-generated schema used a discriminated union for the recipient step, which led to TypeScript type inference errors with React Hook Form's `FieldErrors`. Changed this to a flat object with a `.superRefine()` check (delegating to `newRecipientSchema`) so fields remain easily accessible and properly typed while keeping the rules single-sourced.
   2. *Dynamic balance resolver:* AI initially suggested a static schema instantiated once inside `useForm`. In a banking context where the user can toggle between checking and savings accounts within the same step, this would cause stale validation against the wrong account's balance. Overrode this with a memoized dynamic resolver that inspects `values.fromAccountId` on every validation run.
   3. *Testing Library JSDOM cleanup:* Vitest default configuration in the starter did not register automatic React Testing Library cleanup hooks across test boundaries, causing double-rendered components in subsequent tests. Added explicit `cleanup()` in `afterEach` inside `src/test/setup.ts`.
+  4. *Validation defined once:* A review pass found the new-recipient rules were effectively written twice — once in `newRecipientSchema` and again by hand inside the step's `superRefine`. Refactored so the step delegates to `newRecipientSchema` via `safeParse` and re-maps issues onto the `recipient.*` paths, so each rule lives in exactly one place (brief E3).
+  5. *Debug menu that broke only on deploy:* The debug menu originally drove scenarios via a URL param + hard navigation, which re-registered the MSW service worker and raced its startup — fine locally, flaky on the deployed static host. Diagnosed this as a service-worker race and reworked it to persist the scenario to `localStorage` and do a normal reload, so startup is deterministic. Also gated it behind `?debug=1` and moved it to `src/dev/` so it isn't a customer-facing feature.
+  6. *Accessibility gaps AI left:* Added a real focus trap + initial-focus for the transfer dialog (it was missing), gave the segment switch roving-tabindex arrow-key navigation, removed `role="alert"` from every inline field error (it created a flood of announcements) in favour of `aria-describedby`, and fixed a duplicate clear-button on the search input.
+  7. *Resisted AI/own suggestions that fought the brief:* Deliberately did **not** add `localStorage` persistence for transfers/new payees — it would mean editing the mock handlers (discouraged) or shadowing server data into a client store (cache drift). Kept the in-memory mock's "resets on refresh" behaviour, which the brief states is expected, and relied on TanStack Query as the single source of truth.
+  8. *Scope discipline:* Confirmed against the brief and kept out of scope the things it names — account/transaction detail views, building the Cards/Payments/Insights pages (shown disabled), and saving new recipients as payees (no create-payee endpoint) — rather than adding plausible-looking but unrequested features.
 
 ---
 
