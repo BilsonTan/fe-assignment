@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useCreateTransfer, type TransferResponse } from '../../api'
 import { Button } from '../../common'
+import { useFocusTrap } from '../../hooks'
 import type { TransferFormData, TransferStep } from '../../types'
 import { Stepper } from './stepper'
 import { StepRecipient } from './step-recipient'
@@ -32,9 +33,15 @@ export const TransferDialog: React.FC<TransferDialogProps> = ({
   const [showDiscardConfirm, setShowDiscardConfirm] = useState(false)
 
   const dialogRef = useRef<HTMLDivElement>(null)
+  const discardRef = useRef<HTMLDivElement>(null)
   const triggerRef = useRef<HTMLElement | null>(null)
 
   const createTransferMutation = useCreateTransfer()
+
+  // Trap focus inside whichever dialog is on top: the discard confirmation
+  // when it's open, otherwise the main transfer dialog (brief T1/T8).
+  useFocusTrap(dialogRef, isOpen && !showDiscardConfirm)
+  useFocusTrap(discardRef, isOpen && showDiscardConfirm)
 
   const handleClose = useCallback(() => {
     setStep('recipient')
@@ -71,6 +78,16 @@ export const TransferDialog: React.FC<TransferDialogProps> = ({
       triggerRef.current.focus()
     }
   }, [isOpen])
+
+  // When advancing between steps, pull focus back into the dialog so keyboard
+  // users land on the new step's content instead of a detached element.
+  useEffect(() => {
+    if (!isOpen || showDiscardConfirm) return
+    const dialog = dialogRef.current
+    if (dialog && !dialog.contains(document.activeElement)) {
+      dialog.focus()
+    }
+  }, [step, isOpen, showDiscardConfirm])
 
   // Handle ESC key to close
   useEffect(() => {
@@ -154,6 +171,7 @@ export const TransferDialog: React.FC<TransferDialogProps> = ({
           aria-modal="true"
           aria-labelledby="transfer-dialog-title"
           className="transfer-dialog"
+          tabIndex={-1}
         >
           <div className="dialog-header">
             <h1 id="transfer-dialog-title" className="dialog-title">
@@ -216,7 +234,7 @@ export const TransferDialog: React.FC<TransferDialogProps> = ({
           aria-modal="true"
           aria-labelledby="discard-dialog-title"
         >
-          <div className="discard-dialog">
+          <div className="discard-dialog" ref={discardRef} tabIndex={-1}>
             <h2 id="discard-dialog-title" className="discard-title">
               Discard this transfer?
             </h2>

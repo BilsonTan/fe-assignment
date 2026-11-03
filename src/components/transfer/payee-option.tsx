@@ -17,7 +17,6 @@ export const PayeeOption: React.FC<PayeeOptionProps> = ({
     <label
       className={`payee-card ${isSelected ? 'selected' : ''}`}
       htmlFor={`payee-${payee.id}`}
-      onClick={onSelect}
     >
       <input
         type="radio"

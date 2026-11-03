@@ -165,7 +165,7 @@ export const StepAmount: React.FC<StepAmountProps> = ({
               {...register('amount')}
               aria-describedby={
                 errors.amount
-                  ? 'amount-error'
+                  ? 'amount-limits-info amount-error'
                   : 'amount-limits-info'
               }
             />
