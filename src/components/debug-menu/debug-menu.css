@@ -91,3 +91,35 @@
   font-weight: var(--weight-semibold);
 }
 
+.debug-tip-box {
+  margin-top: var(--space-2);
+  padding: 8px 10px;
+  background-color: var(--surface-muted);
+  border-left: 3px solid var(--brand);
+  border-radius: var(--radius-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.debug-tip-label {
+  font-size: 11px;
+  font-weight: var(--weight-semibold);
+  color: var(--text);
+}
+
+.debug-tip-text {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: var(--leading-normal);
+}
+
+.debug-tip-text code {
+  background-color: var(--border);
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-family: monospace;
+  font-weight: var(--weight-semibold);
+  color: var(--text);
+}
+

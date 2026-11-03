@@ -85,6 +85,13 @@ export const DebugMenu: React.FC = () => {
               <span>Slow Network (?delay=2000)</span>
             </button>
           </div>
+
+          <div className="debug-tip-box">
+            <span className="debug-tip-label">💡 Test Transfer Failure (T7):</span>
+            <span className="debug-tip-text">
+              Enter <code>#fail</code> in the transfer note on Step 2 to simulate an API rejection.
+            </span>
+          </div>
         </div>
       )}
 

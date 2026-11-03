@@ -28,8 +28,28 @@ export async function apiFetch<T>(
   path: string,
   init?: RequestInit,
 ): Promise<T> {
-  const url = `${BASE_URL}${path.replace(/^\//, '')}`
-  const response = await fetch(url, init)
+  const cleanPath = path.replace(/^\//, '')
+  const origin =
+    typeof window !== 'undefined' && window.location.origin
+      ? window.location.origin
+      : 'http://localhost:5173'
+  const url = new URL(`${BASE_URL}${cleanPath}`, origin)
+
+  // Propagate demo hooks (?scenario and ?delay) from window.location if present
+  if (typeof window !== 'undefined' && window.location.search) {
+    const pageParams = new URLSearchParams(window.location.search)
+    const scenario = pageParams.get('scenario')
+    const delay = pageParams.get('delay')
+
+    if (scenario && !url.searchParams.has('scenario')) {
+      url.searchParams.set('scenario', scenario)
+    }
+    if (delay && !url.searchParams.has('delay')) {
+      url.searchParams.set('delay', delay)
+    }
+  }
+
+  const response = await fetch(url.toString(), init)
   const body = (await response.json().catch(() => null)) as
     | T
     | ApiErrorBody
