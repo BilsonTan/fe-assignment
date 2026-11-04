@@ -107,8 +107,8 @@ export const StepReview: React.FC<StepReviewProps> = ({
       </div>
 
       <div className="dialog-footer">
-        <Button variant="ghost" onClick={onBack} disabled={isSubmitting}>
-          ← Back
+        <Button variant="ghost" onClick={onBack} disabled={isSubmitting} aria-label="Back">
+          <span aria-hidden="true">← </span>Back
         </Button>
         <Button
           variant="primary"

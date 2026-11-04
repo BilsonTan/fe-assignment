@@ -234,8 +234,8 @@ export const StepAmount: React.FC<StepAmountProps> = ({
       </div>
 
       <div className="dialog-footer">
-        <Button variant="ghost" onClick={onBack}>
-          ← Back
+        <Button variant="ghost" onClick={onBack} aria-label="Back">
+          <span aria-hidden="true">← </span>Back
         </Button>
         <Button variant="primary" type="submit">
           Continue

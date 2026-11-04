@@ -60,6 +60,7 @@ export const BalanceHero: React.FC<BalanceHeroProps> = ({
             variant="secondary"
             className="hero-transfer-btn"
             onClick={onOpenTransfer}
+            aria-label="New transfer"
           >
             + New transfer
           </Button>
